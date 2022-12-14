@@ -29,7 +29,7 @@ X_reduced = pca.fit_transform(X_train)
 #print(pd.DataFrame(pca.components_).loc[:10,:5])
 
 # Get the optimal number of PCA
-def show_mse_by_number_of_pca(fold_nb = 10, nb_of_pca_to_show = 100):
+def show_mse_by_number_of_pca(fold_nb = 10, nb_of_pca_to_show = 30):
     n = len(X_reduced)
     kf = model_selection.KFold(n_splits=10)
     regr = LinearRegression()
@@ -42,6 +42,7 @@ def show_mse_by_number_of_pca(fold_nb = 10, nb_of_pca_to_show = 100):
     for i in range(1,nb_of_pca_to_show):
         score = -1*model_selection.cross_val_score(regr, X_reduced[:,:i], y_train.ravel(), cv=kf, scoring='neg_mean_squared_error').mean()
         mse.append(score)
+    print(mse)
     plt.plot(mse, '-v')
     plt.xlabel('Number of principal components in regression')
     plt.ylabel('MSE')
@@ -50,7 +51,7 @@ def show_mse_by_number_of_pca(fold_nb = 10, nb_of_pca_to_show = 100):
     # We can see 2 discontinuity in the value of the mse, one at 5 principle component, one at 27 principal component
     # We keep only 27 principal components out of 122
 
-def load_optimal_pca(X_preprocess, component_nb = 27):
+def load_optimal_pca(X_train, component_nb = 15):
     pca_opti = PCA(n_components = component_nb)
     pca_opti.fit_transform(X_train)    
     return pca_opti
@@ -67,7 +68,7 @@ def get_explained_variance(pcamodel):
     plt.show()
 
 # Effect of variables on each components
-def show_effect_of_features_on_pc(pcamodel, X_train, nb_feature_to_show = 50):
+def show_effect_of_features_on_pc(pcamodel, X_train, nb_feature_to_show = 33):
     ax = sns.heatmap(pcamodel.components_[:,:nb_feature_to_show],
                     cmap='YlGnBu',
                     yticklabels=[ "PCA"+str(X_train) for X_train in range(1,pcamodel.n_components_+1)],
@@ -80,6 +81,6 @@ def show_effect_of_features_on_pc(pcamodel, X_train, nb_feature_to_show = 50):
 
 if __name__ == "__main__":
     show_mse_by_number_of_pca()
-    pcamodel = load_optimal_pca(X_reduced)
-    get_explained_variance(pcamodel)
-    show_effect_of_features_on_pc(pcamodel, X_train)
+    #pcamodel = load_optimal_pca(X_train)
+    #get_explained_variance(pcamodel)
+    #show_effect_of_features_on_pc(pcamodel, X_train)
